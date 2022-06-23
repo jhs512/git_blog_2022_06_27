@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: "GmarketSansMedium";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
@@ -6,7 +10,20 @@
   font-style: normal;
 }
 
-html > body {
+html > body,
+html > body .prism-code,
+html > body .markdown-body {
   font-family: "GmarketSansMedium";
   text-underline-position: under;
+}
+
+html,
+body,
+#___gatsby,
+#gatsby-focus-wrapper {
+  height: 100%;
+}
+
+body {
+  color: #333;
 }

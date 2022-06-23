@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: "My First Gatsby Site",
+    title: "😺 장희성 기술 블로그",
   },
   plugins: [
     "gatsby-plugin-image",
@@ -14,5 +14,7 @@ module.exports = {
     },
     "gatsby-plugin-mdx",
     "gatsby-transformer-sharp",
+    "gatsby-plugin-postcss",
+    "gatsby-plugin-react-helmet",
   ],
 };

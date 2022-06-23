@@ -1,49 +1,93 @@
 import React from "react";
-import { graphql } from "gatsby";
+import { graphql, Link } from "gatsby";
 import { MDXRenderer } from "gatsby-plugin-mdx";
-import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import Layout from "../../components/Layout";
 import CodeBlock from "../../components/CodeBlock";
 import { MDXProvider } from "@mdx-js/react";
+import classNames from "classnames";
 
 const BlogPost = ({ data }) => {
   const tags = data.mdx.frontmatter.tags;
 
-  const image =
-    data.mdx.frontmatter.hero_image &&
-    getImage(data.mdx.frontmatter.hero_image);
-
   return (
     <Layout pageTitle={data.mdx.frontmatter.title}>
-      <p>{data.mdx.frontmatter.date}</p>
-      {image && (
-        <>
-          <GatsbyImage
-            image={image}
-            alt={data.mdx.frontmatter.hero_image_alt}
-          />
-          <p>
-            Photo Credit:{" "}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={data.mdx.frontmatter.hero_image_credit_link}
+      <div className="container mx-auto px-[10px]">
+        <div className="flex flex-col md:flex-row gap-[5px] font-bold mt-[30px]">
+          <div className="flex gap-[10px]">
+            <h2>{data.mdx.slug.replace("/", "")}.</h2>
+            <h2>{data.mdx.frontmatter.title}</h2>
+          </div>
+          {data.mdx.frontmatter.tags && (
+            <div className="text-[#afafaf] flex gap-[5px]">
+              {data.mdx.frontmatter.tags.map((tag) => (
+                <Link to={`/tags#${tag}`} className="hover:text-[red]">
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+          )}
+          <div className="md:ml-auto flex items-baseline flex gap-[10px] text-[#878787]">
+            <i className="fa-solid fa-calendar"></i> {data.mdx.frontmatter.date}
+          </div>
+        </div>
+
+        <div className="text-[#676767] mt-[20px]">
+          <i className="fa-solid fa-id-card"></i>{" "}
+          <span className="font-bold">글 내용</span>
+        </div>
+
+        <div className="mt-[10px]">
+          <div className="markdown-body">
+            <MDXProvider
+              components={{
+                pre: CodeBlock,
+              }}
             >
-              {data.mdx.frontmatter.hero_image_credit_text}
-            </a>
-          </p>
-        </>
-      )}
-      <hr />
-      <MDXProvider
-        components={{
-          pre: CodeBlock,
-        }}
-      >
-        <MDXRenderer>{data.mdx.body}</MDXRenderer>
-      </MDXProvider>
-      <hr />
-      TAGS : {tags && tags.join(", ")}
+              <MDXRenderer>{data.mdx.body}</MDXRenderer>
+            </MDXProvider>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-[10px]">
+        <div className="text-[#676767] mt-[20px]">
+          <i className="fa-solid fa-list"></i>{" "}
+          <span className="font-bold">글 목록</span>
+        </div>
+        <div className="flex flex-col gap-[20px] mt-[10px]">
+          {data.allMdx.nodes.map((node) => (
+            <div
+              key={node.id}
+              className="flex flex-col md:flex-row gap-[5px] font-bold"
+            >
+              <Link
+                to={`/blog/${node.slug}`}
+                className={classNames("flex gap-[10px]", {
+                  "text-[red]": node.id == data.mdx.id,
+                })}
+              >
+                <h2>{node.slug.replace("/", "")}.</h2>
+                <h2>{node.frontmatter.title}</h2>
+              </Link>
+              {node.frontmatter.tags && (
+                <div className="text-[#afafaf] flex gap-[5px]">
+                  {node.frontmatter.tags.map((tag) => (
+                    <Link to={`/tags#${tag}`} className="hover:text-[red]">
+                      #{tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Link
+                to={`/blog/${node.slug}`}
+                className="md:ml-auto flex items-baseline flex gap-[10px] text-[#878787] hover:text-[red]"
+              >
+                <i className="fa-solid fa-calendar"></i> {node.frontmatter.date}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
     </Layout>
   );
 };
@@ -52,18 +96,28 @@ export const query = graphql`
     mdx(id: { eq: $id }) {
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
-        hero_image_alt
-        hero_image_credit_link
-        hero_image_credit_text
-        hero_image {
-          childImageSharp {
-            gatsbyImageData
-          }
-        }
+        date(formatString: "YY-MM-DD HH:MM")
         tags
       }
+      id
+      slug
       body
+      tableOfContents
+      headings {
+        value
+      }
+    }
+
+    allMdx(sort: { fields: frontmatter___date, order: DESC }) {
+      nodes {
+        frontmatter {
+          date(formatString: "YY-MM-DD HH:MM")
+          title
+          tags
+        }
+        id
+        slug
+      }
     }
   }
 `;
